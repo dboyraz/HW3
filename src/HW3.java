@@ -55,13 +55,12 @@ public class HW3 {
         queue.enqueue("banana");
         queue.enqueue("cherry");
         queue.enqueue("mahmut");
-        System.out.println(queue.dequeue()); // Output: apple
+        System.out.println(queue.dequeue()); // Output: osman
         System.out.println(queue.dequeue()); // Output: banana
         System.out.println(queue.dequeue()); // Output: cherry
         System.out.println(queue.isEmpty()); // Output: false
         System.out.println(queue.size()); // Output: 1
-        String[] arr = queue.toArray();
-        System.out.println(Arrays.toString(arr)); // Output: [mahmut]
+
 
 
         stack.push("apple");
@@ -193,74 +192,88 @@ public class HW3 {
 
         class StringQueue {
             private String[] data;
-            private int front;
-            private int rear;
+            private int head;
+            private int tail;
+            private int size;
 
-            public StringQueue(int capacity) {
-                data = new String[capacity];
-                front = 0;
-                rear = 0;
+            public StringQueue(int initialCapacity) {
+                data = new String[initialCapacity];
+                head = 0;
+                tail = 0;
+                size = 0;
             }
 
-            public void enqueue(String value) {
-                if (rear == data.length) {
-                    throw new IllegalStateException("Queue is full");
+            public void enqueue(String element) {
+                if (tail == data.length) {
+                    resize();
                 }
-                data[rear++] = value;
+                data[tail++] = element;
+                size++;
             }
 
             public String dequeue() {
-                if (front == rear) {
-                    throw new IllegalStateException("Queue is empty");
+                if (head == tail) {
+                    return null;
                 }
-                String value = data[front];
-                data[front] = null;
-                front++;
-                return value;
-            }
-
-            public boolean isEmpty() {
-                return front == rear;
+                String element = data[head];
+                head++;
+                size--;
+                return element;
             }
 
             public int size() {
-                return rear - front;
+                return size;
             }
 
-            public String[] toArray() {
-                return Arrays.copyOfRange(data, front, rear);
+            public boolean isEmpty() {
+                return size == 0;
+            }
+
+            private void resize() {
+                String[] newData = new String[data.length * 2];
+                System.arraycopy(data, 0, newData, 0, data.length);
+                data = newData;
             }
         }
 
+
         class StringStack {
-            private String[] stack;
+            private String[] data;
             private int top;
 
-            public StringStack(int capacity) {
-                stack = new String[capacity];
+            public StringStack(int initialCapacity) {
+                data = new String[initialCapacity];
                 top = -1;
             }
 
             public void push(String element) {
-                if (top == stack.length - 1) {
-                    throw new IllegalStateException("Stack is full");
+                if (top == data.length - 1) {
+                    resize();
                 }
-                stack[++top] = element;
+                data[++top] = element;
             }
 
             public String pop() {
-                if (top == -1) {
-                    throw new IllegalStateException("Stack is empty");
+                if (top < 0) {
+                    return null;
                 }
-                return stack[top--];
-            }
-
-            public boolean isEmpty() {
-                return top == -1;
+                String element = data[top];
+                data[top--] = null;
+                return element;
             }
 
             public int size() {
                 return top + 1;
+            }
+
+            public boolean isEmpty() {
+                return top < 0;
+            }
+
+            private void resize() {
+                String[] newData = new String[data.length * 2];
+                System.arraycopy(data, 0, newData, 0, data.length);
+                data = newData;
             }
         }
     }
