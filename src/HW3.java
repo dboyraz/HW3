@@ -1,5 +1,3 @@
-import java.util.Arrays;
-import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -47,6 +45,8 @@ public class HW3 {
 
         } */
 
+
+         /*
         ResizingArrayQueueAndStackOfStrings.StringQueue queue = new ResizingArrayQueueAndStackOfStrings().new StringQueue(5);
         ResizingArrayQueueAndStackOfStrings.StringStack stack = new ResizingArrayQueueAndStackOfStrings().new StringStack(5);
 
@@ -69,6 +69,56 @@ public class HW3 {
         System.out.println(stack.pop()); // Output: cherry
         System.out.println(stack.pop()); // Output: banana
         System.out.println(stack.pop()); // Output: apple
+        */
+
+        /* ******************************************************************************** */
+
+
+
+
+        /*
+         * Reads a sequence of pairs of integers (Must be between 0 and 19 for our case)
+         *  from standard input, where each integer
+         * in the pair represents some element
+         * if the elements are in different sets, merge the two sets
+         * and print the pair to standard output.
+         */
+
+        Scanner sc = new Scanner(System.in);
+
+        QuickUnion uf = new QuickUnion(20);
+
+        System.out.println("Enter numbers between 0 and 19, CTRL+D to break out of loop.");
+
+        while (sc.hasNext()) {
+
+
+            int p = sc.nextInt();
+            int q = sc.nextInt();
+            if ((p > 20 || p < 0)){
+                System.out.println("Your entries must be between 0 and 19!");
+                System.out.println("Entry reset to 0.");
+                p = 0;
+            }
+            if ((q > 20 || q < 0)){
+                System.out.println("Your entries must be between 0 and 19!");
+                System.out.println("Entry reset to 0.");
+                q = 0;
+            }
+            if (uf.find(p) == uf.find(q)) continue;
+            uf.union(p, q);
+            System.out.println(p + " " + q);
+
+
+        }
+
+
+        System.out.println(uf.count() + " components");
+        System.out.println(uf.getExchangeCounter() + " exchanges");
+        System.out.println(uf.getFindCounter() + " finds");
+
+        sc.close();
+
 
     }
 
@@ -277,6 +327,124 @@ public class HW3 {
             }
         }
     }
+
+
+    static class QuickFind{
+
+        private int[] id;
+        private int count;
+        private int exchangeCounter;
+        private int findCounter;
+
+
+        public QuickFind(int n) {
+            exchangeCounter = 0;
+            findCounter = 0;
+            count = n;
+            id = new int[n];
+            for (int i = 0; i < n; i++)
+                id[i] = i;
+        }
+
+        public int count() {
+            return count;
+        }
+
+        public int find(int p) {
+            validate(p);
+            findCounter++;
+            return id[p];
+        }
+
+        private void validate(int p) {
+            int n = id.length;
+            if (p < 0 || p >= n) {
+                throw new IllegalArgumentException("index " + p + " is not between 0 and " + (n-1));
+            }
+        }
+
+        public void union(int p, int q) {
+            validate(p);
+            validate(q);
+
+            int pID = id[p];   // needed for correctness
+            int qID = id[q];   // to reduce the number of array accesses
+
+            // p and q are already in the same component
+            if (pID == qID) return;
+
+            for (int i = 0; i < id.length; i++)
+                if (id[i] == pID) id[i] = qID;
+            count--;
+            exchangeCounter++;
+        }
+
+        public int getExchangeCounter() {
+            return exchangeCounter;
+        }
+
+        public int getFindCounter() {
+            return findCounter;
+        }
+
+    }
+
+    static class QuickUnion{
+
+        private int[] parent;
+        private int count;
+        private int exchangeCounter;
+        private int findCounter;
+
+        public QuickUnion(int n) {
+            exchangeCounter = 0;
+            findCounter = 0;
+            parent = new int[n];
+            count = n;
+            for (int i = 0; i < n; i++) {
+                parent[i] = i;
+            }
+        }
+
+        public int count() {
+            return count;
+        }
+        public int find(int p) {
+            validate(p);
+
+            while (p != parent[p])
+                p = parent[p];
+            findCounter++;
+            return p;
+        }
+
+        // validate that p is a valid index
+        private void validate(int p) {
+            int n = parent.length;
+            if (p < 0 || p >= n) {
+                throw new IllegalArgumentException("index " + p + " is not between 0 and " + (n-1));
+            }
+        }
+
+        public void union(int p, int q) {
+            int rootP = find(p);
+            int rootQ = find(q);
+            if (rootP == rootQ) return;
+            parent[rootP] = rootQ;
+            exchangeCounter++;
+            count--;
+        }
+
+        public int getExchangeCounter() {
+            return exchangeCounter;
+        }
+
+        public int getFindCounter() {
+            return findCounter;
+        }
+    }
+
+
 
 
 }
