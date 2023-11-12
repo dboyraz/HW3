@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Scanner;
 public class HW3 {
 
     public static void main(String[] args) {
-    /*
+
         // Initiate the scanner
         Scanner scanner = new Scanner(System.in);
 
@@ -23,27 +24,18 @@ public class HW3 {
         // Initiate the array with the size
         int[] arr = new int[n];
 
-        System.out.println("type 0 if you would like to generate a random array with " + n + " elements.");
-        if (scanner.nextInt() == 0) {
-            Random rd = new Random();
-            for (int i = 0; i < n; i++) {
-                arr[i] = rd.nextInt(255);
-            }
+        System.out.println("Generating array with " + n + " elements...");
+        Random rd = new Random();
+        for (int i = 0; i < n; i++) {
+            arr[i] = rd.nextInt(255);
+        }
 
-            System.out.println("your randomly generate array is: ");
-            printArray(arr);
-            algoSelector(arr);
 
-        } else {
-            System.out.println("Enter the elements of the array:");
-            // Take the input and put them into the array
-            for (int i = 0; i < n; i++) {
-                arr[i] = scanner.nextInt();
+        System.out.println("your randomly generate array is: ");
+        printArray(arr);
+        algoSelector(arr);
 
-            }
-            algoSelector(arr);
 
-        } */
 
 
          /*
@@ -83,6 +75,8 @@ public class HW3 {
          * if the elements are in different sets, merge the two sets
          * and print the pair to standard output.
          */
+        // ----------------------------------------------------------------------------------------------
+        /* QUICK FIND + QUICK UNION
 
         Scanner sc = new Scanner(System.in);
 
@@ -120,13 +114,27 @@ public class HW3 {
         sc.close();
 
 
+         */
+
+        /*
+        QuickUnionPC qu = new QuickUnionPC(5);
+        qu.union(1, 2);
+        qu.union(2, 3);
+        qu.union(3, 4);
+
+        System.out.println("Components: " + qu.count());
+        System.out.println("Size of component containing 1: " + qu.size(1));
+
+         */
+
+
     }
 
 
     public static void algoSelector(int[] arr) {
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Type 1 for Bubble sort, type 2 for Selection sort.");
+        System.out.println("Type 1 for Bubble sort,  2 for Selection sort, 3 for Insertion sort.");
 
         int algoType = scanner.nextInt();
 
@@ -143,6 +151,17 @@ public class HW3 {
             System.out.println("Array sorted using Selection Sort:");
             printArray(arr);
 
+        } else if (algoType == 3) {
+
+            long startTime = System.nanoTime();
+            insertionSort(arr, sortAD);
+            long endTime = System.nanoTime();
+            System.out.println("Array sorted using Insertion Sort:");
+            printArray(arr);
+            long duration = (endTime - startTime);
+            double seconds = ((double) duration / 1000000000);
+            System.out.println("Insertion Sort took " + seconds + " seconds(" +duration + " nanoseconds) to sort the array.");
+
         } else {
             System.out.println("wrong selection, select again");
             algoSelector(arr);
@@ -150,6 +169,35 @@ public class HW3 {
 
         // Close the scanner since we are done
         scanner.close();
+    }
+
+    public static void insertionSort(int[] arr, int sort) {
+        int n = arr.length;
+
+        if (sort == 1) {
+            for (int i = 1; i < n; ++i) {
+                int key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j] > key) {
+                    arr[j + 1] = arr[j];
+                    j = j - 1;
+                }
+                arr[j + 1] = key;
+            }
+        } else if (sort == 2) {
+            for (int i = 1; i < n; ++i) {
+                int key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j] < key) {
+                    arr[j + 1] = arr[j];
+                    j = j - 1;
+                }
+                arr[j + 1] = key;
+            }
+        }
+
     }
 
     public static void selectionSort(int[] arr, int sort) {
@@ -329,7 +377,7 @@ public class HW3 {
     }
 
 
-    static class QuickFind{
+    static class QuickFind {
 
         private int[] id;
         private int count;
@@ -359,7 +407,7 @@ public class HW3 {
         private void validate(int p) {
             int n = id.length;
             if (p < 0 || p >= n) {
-                throw new IllegalArgumentException("index " + p + " is not between 0 and " + (n-1));
+                throw new IllegalArgumentException("index " + p + " is not between 0 and " + (n - 1));
             }
         }
 
@@ -389,7 +437,7 @@ public class HW3 {
 
     }
 
-    static class QuickUnion{
+    static class QuickUnion {
 
         private int[] parent;
         private int count;
@@ -409,6 +457,7 @@ public class HW3 {
         public int count() {
             return count;
         }
+
         public int find(int p) {
             validate(p);
 
@@ -422,7 +471,7 @@ public class HW3 {
         private void validate(int p) {
             int n = parent.length;
             if (p < 0 || p >= n) {
-                throw new IllegalArgumentException("index " + p + " is not between 0 and " + (n-1));
+                throw new IllegalArgumentException("index " + p + " is not between 0 and " + (n - 1));
             }
         }
 
@@ -444,7 +493,55 @@ public class HW3 {
         }
     }
 
+    static class QuickUnionPC {
+        private int[] id;
+        private int[] sz;
+        private int count;
 
+        public QuickUnionPC(int n) {
+            id = new int[n];
+            sz = new int[n];
+            count = n;
+            for (int i = 0; i < n; i++) {
+                id[i] = i;
+                sz[i] = 1;
+            }
+        }
+
+        public int find(int p) {
+            while (p != id[p]) {
+                p = id[p];
+            }
+            return p;
+        }
+
+        public void union(int p, int q) {
+            int pRoot = find(p);
+            int qRoot = find(q);
+            if (pRoot == qRoot) return;
+
+            // link every site on the paths from p and q to the roots of their trees to the root of the new tree
+            for (int k = 0; k < id.length; k++) {
+                if (id[k] == pRoot || id[k] == qRoot) {
+                    id[k] = pRoot;
+                }
+            }
+
+            // update the size of the new tree
+            sz[pRoot] += sz[qRoot];
+
+            // decrement the count of components
+            count--;
+        }
+
+        public int count() {
+            return count;
+        }
+
+        public int size(int p) {
+            return sz[find(p)];
+        }
+    }
 
 
 }
