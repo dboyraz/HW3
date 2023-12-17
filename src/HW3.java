@@ -16,6 +16,11 @@ public class HW3 {
         // Initiate the scanner
         Scanner scanner = new Scanner(System.in);
 
+        // Initiate classes
+        MergeSortTD mergeTD = new MergeSortTD();
+        MergeSortBottomUp mergeBU = new MergeSortBottomUp();
+        Quicksort quicksort = new Quicksort();
+
         // Ask for the size of the array to create one
         System.out.print("Enter the number of elements in the array: ");
         int n = scanner.nextInt();
@@ -33,7 +38,38 @@ public class HW3 {
 
         System.out.println("your randomly generate array is: ");
         printArray(arr);
-        algoSelector(arr);
+
+        System.out.println("Sorting the array using Merge Sort Top Down...");
+        long startTime = System.nanoTime();
+        mergeTD.sort(arr);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        double seconds = ((double) duration / 1000000000);
+        System.out.println("Top Down took " + seconds + " seconds(" +duration + " nanoseconds) to sort the array.");
+
+        printArray(arr);
+
+        System.out.println("Sorting the array using Merge Sort Bottom Up...");
+        long startTime2 = System.nanoTime();
+        mergeBU.sort(arr);
+        long endTime2 = System.nanoTime();
+        long duration2 = (endTime2 - startTime2);
+        double seconds2 = ((double) duration2 / 1000000000);
+        System.out.println("Top Down took " + seconds2 + " seconds(" +duration2 + " nanoseconds) to sort the array.");
+        printArray(arr);
+
+        System.out.println("Sorting the array using Quick Sort...");
+        long startTime3 = System.nanoTime();
+        quicksort.sort(arr);
+        long endTime3 = System.nanoTime();
+        long duration3 = (endTime3 - startTime3);
+        double seconds3 = ((double) duration3 / 1000000000);
+        System.out.println("Quicksort took " + seconds3 + " seconds(" +duration3 + " nanoseconds) to sort the array.");
+        printArray(arr);
+
+
+        scanner.close();
+
 
 
 
@@ -275,7 +311,6 @@ public class HW3 {
 
 
     }
-
 
     // Helper method for printing an array
     public static void printArray(int[] arr) {
@@ -541,6 +576,124 @@ public class HW3 {
         public int size(int p) {
             return sz[find(p)];
         }
+    }
+
+    static class MergeSortTD {
+
+            private static void merge(int[] a, int[] aux, int lo, int mid, int hi) {
+                // copy to aux[]
+                for (int k = lo; k <= hi; k++) {
+                    aux[k] = a[k];
+                }
+
+                // merge back to a[]
+                int i = lo, j = mid + 1;
+                for (int k = lo; k <= hi; k++) {
+                    if (i > mid) a[k] = aux[j++];
+                    else if (j > hi) a[k] = aux[i++];
+                    else if (aux[j] < aux[i]) a[k] = aux[j++];
+                    else a[k] = aux[i++];
+                }
+            }
+
+            private static void sort(int[] a, int[] aux, int lo, int hi) {
+                if (hi <= lo) return;
+                int mid = lo + (hi - lo) / 2;
+                sort(a, aux, lo, mid);
+                sort(a, aux, mid + 1, hi);
+                merge(a, aux, lo, mid, hi);
+            }
+
+            public static void sort(int[] a) {
+                int[] aux = new int[a.length];
+                sort(a, aux, 0, a.length - 1);
+            }
+
+
+    }
+
+    static class MergeSortBottomUp{
+
+            private static void merge(int[] a, int[] aux, int lo, int mid, int hi) {
+                // copy to aux[]
+                for (int k = lo; k <= hi; k++) {
+                    aux[k] = a[k];
+                }
+
+                // merge back to a[]
+                int i = lo, j = mid + 1;
+                for (int k = lo; k <= hi; k++) {
+                    if (i > mid) a[k] = aux[j++];
+                    else if (j > hi) a[k] = aux[i++];
+                    else if (aux[j] < aux[i]) a[k] = aux[j++];
+                    else a[k] = aux[i++];
+                }
+            }
+
+            public static void sort(int[] a) {
+                int n = a.length;
+                int[] aux = new int[n];
+                for (int len = 1; len < n; len *= 2) {
+                    for (int lo = 0; lo < n - len; lo += len + len) {
+                        int mid = lo + len - 1;
+                        int hi = Math.min(lo + len + len - 1, n - 1);
+                        merge(a, aux, lo, mid, hi);
+                    }
+                }
+            }
+    }
+
+    static class Quicksort {
+
+        private static int partition(int[] a, int lo, int hi) {
+            int i = lo;
+            int j = hi + 1;
+            int v = a[lo];
+            while (true) {
+
+                // find item on lo to swap
+                while (a[++i] < v) {
+                    if (i == hi) break;
+                }
+
+                // find item on hi to swap
+                while (v < a[--j]) {
+                    if (j == lo) break;      // redundant since a[lo] acts as sentinel
+                }
+
+                // check if pointers cross
+                if (i >= j) break;
+
+                exch(a, i, j);
+            }
+
+            // put partitioning item v at a[j]
+            exch(a, lo, j);
+
+            // now, a[lo .. j-1] <= a[j] <= a[j+1 .. hi]
+            return j;
+        }
+
+        public static void sort(int[] a) {
+
+            sort(a, 0, a.length - 1);
+        }
+
+        // quicksort the subarray from a[lo] to a[hi]
+        private static void sort(int[] a, int lo, int hi) {
+            if (hi <= lo) return;
+            int j = partition(a, lo, hi);
+            sort(a, lo, j - 1);
+            sort(a, j + 1, hi);
+        }
+
+        private static void exch(int[] a, int i, int j) {
+            int swap = a[i];
+            a[i] = a[j];
+            a[j] = swap;
+        }
+
+
     }
 
 
